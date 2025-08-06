@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """This module defines a function to transpose a matrix."""
+
+
 def matrix_transpose(matrix):
     """Return transpose of a matrix
     second method
