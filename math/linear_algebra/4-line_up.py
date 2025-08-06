@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""This module defines 
+"""This module defines
 a function to add two arrays of int/float."""
 
 
