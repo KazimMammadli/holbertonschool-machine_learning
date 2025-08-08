@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """This module is about slicing of matrices"""
-import numpy as np
 
 
 def np_slice(matrix, axes={}):
