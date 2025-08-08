@@ -4,7 +4,7 @@
 
 def np_slice(matrix, axes={}):
     """Return the sliced matrix"""
-    slicers = [slice(None)] * matrix.ndim 
+    slicers = [slice(None)] * matrix.ndim
     for axis, val in axes.items():
-        slicers[axis] = slice(*val) 
+        slicers[axis] = slice(*val)
     return matrix[tuple(slicers)]
