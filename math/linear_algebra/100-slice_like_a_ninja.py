@@ -1,14 +1,10 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 """This module is about slicing of matrices"""
 
 
 def np_slice(matrix, axes={}):
     """Return the sliced matrix"""
-    for key, val in axes.items():
-        if key == 0:
-            matrix = matrix[slice(*val)]
-        if key == 1:
-            matrix = matrix[:, slice(*val)]
-        if key == 2:
-            matrix = matrix[:, :, slice(*val)]
-    return matrix
+    slicers = [slice(None)] * matrix.ndim 
+    for axis, val in axes.items():
+        slicers[axis] = slice(*val) 
+    return matrix[tuple(slicers)]
