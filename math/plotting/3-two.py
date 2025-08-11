@@ -18,7 +18,7 @@ def two():
     plt.xlabel("Time (years)")
     plt.ylabel("Fraction Remaining")
     plt.title("Exponential Decay of Radioactive Elements")
-    plt.axis([0, 20000, 0 ,1])
+    plt.axis([0, 20000, 0, 1])
     plt.plot(x, y1, "r--", label="C-14")
     plt.plot(x, y2, "g-", label="Ra-226")
     plt.legend()
