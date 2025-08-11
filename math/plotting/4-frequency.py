@@ -13,5 +13,6 @@ def frequency():
     plt.ylabel("Number of Students")
     plt.title("Project A")
     plt.axis([0, 100, 0, 30])
-    plt.hist(student_grades, bins=10, edgecolor="k")
+    bins = np.arange(0, 101, 10)
+    plt.hist(student_grades, bins=bins, edgecolor="k")
     plt.show()     
