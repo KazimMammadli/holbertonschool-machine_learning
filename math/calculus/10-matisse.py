@@ -1,4 +1,4 @@
-#!/usr/env/bin python3
+#!/usr/bin/env python3
 """
 This module defines a function to find
 coefficients of derivatives.
