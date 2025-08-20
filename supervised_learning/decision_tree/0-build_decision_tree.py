@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Decision tree - max depth."""
-
 import numpy as np
 
 
@@ -22,6 +21,7 @@ class Node:
 
     def max_depth_below(self):
         """Return maximum depth of all descendants below this node."""
+        left = right = self.depth
         if self.left_child is not None:
             left = self.left_child.max_depth_below()
         if self.right_child is not None:
