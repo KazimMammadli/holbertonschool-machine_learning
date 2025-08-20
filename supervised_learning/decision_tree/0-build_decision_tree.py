@@ -20,13 +20,14 @@ class Node:
         self.depth = depth
 
     def max_depth_below(self):
-        """Return maximum depth of all descendants below this node."""
-        left = right = self.depth
-        if self.left_child is not None:
-            left = self.left_child.max_depth_below()
-        if self.right_child is not None:
-            right = self.right_child.max_depth_below()
-        return max(left, right)
+    """Return maximum depth of all descendants below this node."""
+    if self.is_leaf:
+        return self.depth
+
+    left = self.left_child.max_depth_below() if self.left_child else self.depth
+    right = self.right_child.max_depth_below() if self.right_child else self.depth
+    
+    return max(left, right)
 
 
 class Leaf(Node):
