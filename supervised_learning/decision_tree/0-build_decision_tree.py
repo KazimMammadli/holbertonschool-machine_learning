@@ -20,14 +20,12 @@ class Node:
         self.depth = depth
 
     def max_depth_below(self):
-    """Return maximum depth of all descendants below this node."""
-    if self.is_leaf:
-        return self.depth
-
-    left = self.left_child.max_depth_below() if self.left_child else self.depth
-    right = self.right_child.max_depth_below() if self.right_child else self.depth
-    
-    return max(left, right)
+        """Return maximum depth of all descendants below this node."""
+        if self.is_leaf:
+            return self.depth
+        left = self.left_child.max_depth_below() if self.left_child else self.depth
+        right = self.right_child.max_depth_below() if self.right_child else self.depth
+        return max(left, right)
 
 
 class Leaf(Node):
@@ -45,7 +43,7 @@ class Leaf(Node):
         return self.depth
 
 
-class DecisionTree:
+class Decision_Tree():
     """Decision tree class."""
 
     def __init__(self, max_depth=10, min_pop=1, seed=0,
