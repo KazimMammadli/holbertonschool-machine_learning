@@ -73,11 +73,11 @@ class Node:
     def __str__(self):
         """Return an ASCII representation."""
         if self.is_root:
-            label = f"root [feature={self.feature}\
-            , threshold={self.threshold}]"
+            label = (f"root [feature={self.feature}"
+                     f", threshold={self.threshold}]")
         else:
-            label = f"node [feature={self.feature},\
-            threshold={self.threshold}]"
+            label = (f"node [feature={self.feature}"
+                     f", threshold={self.threshold}]")
 
         result = label
         if self.left_child:
@@ -139,4 +139,5 @@ class Decision_Tree():
         return self.root.count_nodes_below(only_leaves=only_leaves)
 
     def __str__(self):
+        """Print the tree."""
         return self.root.__str__()
