@@ -140,4 +140,4 @@ class Decision_Tree():
 
     def __str__(self):
         """Print the tree."""
-        return self.root.__str__()
+        return self.root.__str__() + "\n"
