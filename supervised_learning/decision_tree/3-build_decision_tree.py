@@ -58,7 +58,7 @@ class Node:
         """Return the list of all leaves of the tree."""
         if self.is_leaf:
             return [self]
- 
+
         leaves = []
         if self.left_child:
             leaves.extend(self.left_child.get_leaves_below())
