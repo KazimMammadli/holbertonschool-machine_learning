@@ -158,8 +158,10 @@ class Node:
             else:
                 return np.ones(x.shape[0], dtype=bool)
 
-        self.indicator = lambda x:
-            np.all(np.array([is_large_enough(x), is_small_enough(x)]), axis=0)
+        self.indicator = lambda x: np.all(np.array(
+                                                   [is_large_enough(x),
+                                                    is_small_enough(x)]),
+                                          axis=0)
 
 
 class Leaf(Node):
