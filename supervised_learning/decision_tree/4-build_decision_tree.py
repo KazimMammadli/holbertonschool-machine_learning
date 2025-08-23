@@ -77,17 +77,9 @@ class Node:
                 child.lower = self.lower.copy()
 
                 if child == self.left_child:
-                    if self.feature in child.lower:
-                        child.lower[self.feature] =
-                        max(child.lower[self.feature], self.threshold)
-                    else:
-                        child.lower[self.feature] = self.threshold
+                    child.lower[self.feature] = self.threshold
                 else:
-                    if self.feature in child.upper:
-                        child.upper[self.feature] =
-                        min(child.upper[self.feature], self.threshold)
-                    else:
-                        child.upper[self.feature] = self.threshold
+                    child.upper[self.feature] = self.threshold
 
         for child in [self.left_child, self.right_child]:
             if child is not None:
