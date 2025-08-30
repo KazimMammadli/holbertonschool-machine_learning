@@ -55,6 +55,7 @@ class Neuron:
         self.__b = self.__b - alpha * db
 
     def train(self, X, Y, iterations=5000, alpha=0.05):
+        """Training."""
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
@@ -64,6 +65,6 @@ class Neuron:
         if alpha <= 0:
             raise ValueError("alpha must be positive")
         for i in range(iterations):
-            A = self.forward_prop(X)  
+            A = self.forward_prop(X)
             self.gradient_descent(X, Y, A, alpha)
         return self.evaluate(X, Y)
