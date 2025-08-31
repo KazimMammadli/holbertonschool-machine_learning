@@ -66,5 +66,7 @@ class NeuralNetwork:
         return self.__A1, self.__A2
 
     def cost(self, Y, A):
-        c = -1 / len(Y[0]) * np.sum((Y * np.log(A)) + (1 - Y) * np.log(1 - A))
+        """Cost function"""
+        c = -1 / len(Y[0]) * np.sum((Y * np.log(A)) +
+                                    (1 - Y) * np.log(1.0000001 - A))
         return c
