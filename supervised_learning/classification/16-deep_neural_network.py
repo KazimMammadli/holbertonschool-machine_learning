@@ -27,6 +27,6 @@ class DeepNeuralNetwrok:
         for i in range(self.L):
             nodes = layers[i]
             prev_node = nx if i == 0 else layers[i - 1]
-            self.weights["W" + str(i + 1)] = (np.random.randn(nodes, nx) *
+            self.weights["W" + str(i + 1)] = (np.random.randn(nodes, prev_node) *
                                               np.sqrt(2 / prev_node))
             self.weights["b{}".format(i + 1)] = np.zeros((nodes, 1))
