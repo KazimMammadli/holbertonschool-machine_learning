@@ -3,7 +3,7 @@
 import numpy as np
 
 
-class DeepNeuralNetwrok:
+class DeepNeuralNetwork:
     """DNN class."""
 
     def __init__(self, nx, layers):
@@ -17,16 +17,17 @@ class DeepNeuralNetwrok:
         if not isinstance(layers, list) or len(layers) == 0:
             raise TypeError("layers must be a list of positive integers")
 
-        if not all(element > 0 for element in layers):
-            raise TypeError("layers must be a list of positive integers")
-
         self.L = len(layers)
         self.cache = {}
         self.weights = {}
 
         for i in range(self.L):
+            if layers[i] <= 0 or not isinstance(layers[i], int):
+                raise TypeError("layers must be a list of positive integers")
+
             nodes = layers[i]
             prev_node = nx if i == 0 else layers[i - 1]
-            self.weights["W" + str(i + 1)] = (np.random.randn(nodes, prev_node) *
+            self.weights["W" + str(i + 1)] = (np.random.randn(nodes,
+                                                              prev_node) *
                                               np.sqrt(2 / prev_node))
             self.weights["b{}".format(i + 1)] = np.zeros((nodes, 1))
