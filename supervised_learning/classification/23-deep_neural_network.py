@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """This module is about Deep Neural Network."""
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class DeepNeuralNetwork:
