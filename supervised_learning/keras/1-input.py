@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
+"""Input class"""
 import tensorflow.keras as K
-"""Input class."""
 
 
 def build_model(nx, layers, activations, lambtha, keep_prob):
