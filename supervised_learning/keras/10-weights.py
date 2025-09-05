@@ -10,4 +10,4 @@ def save_weights(network, filename, save_format='keras'):
 
 def load_weights(network, filename):
     """Load weights."""
-    network.load_weights(filename, save_format=save_format)
+    network.load_weights(filename)
