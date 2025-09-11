@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Momentum Upgraded."""
-import tensoflow as tf
+import tensorflow as tf
 
 
 def create_momentum_op(alpha, beta1):
