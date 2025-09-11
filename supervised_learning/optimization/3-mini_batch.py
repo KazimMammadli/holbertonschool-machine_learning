@@ -2,7 +2,10 @@
 """Mini-Batch"""
 import numpy as np
 
+
 shuffle_data = __import__('2-shuffle_data').shuffle_data
+
+
 def create_mini_batches(X, Y, batch_size):
     """Create mini batches."""
     m = X.shape[0]
