@@ -8,5 +8,8 @@ def update_variables_Adam(alpha, beta1, beta2, epsilon, var,
     and the new second moment, respectively."""
     v = beta1 * v + (1 - beta1) * grad
     s = beta2 * s + (1 - beta2) * grad ** 2
-    var = var - (alpha * v / (s + epsilon) ** 0.5)
+    v_corrected = v / (1 - beta1 ** t)
+    s_corrected = s / (1 - beta2 ** t)
+    var = var - (alpha * v_corrected / (s_corrected
+                                        + epsilon) ** 0.5)
     return var, v, s
