@@ -11,6 +11,6 @@ def create_confusion_matrix(labels, logits):
     labels = np.argmax(labels, axis=1)
     logits = np.argmax(logits, axis=1)
 
-    for a, b in zip(logits, labels):
+    for a, b in zip(labels, logits):
         mat[a][b] += 1
     return mat
