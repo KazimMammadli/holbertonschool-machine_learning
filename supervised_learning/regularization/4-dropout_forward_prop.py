@@ -6,6 +6,7 @@ import numpy as np
 def dropout_forward_prop(X, weights, L, keep_prob):
     """Return a dictionary containing the outputs of each
     layer and the dropout mask used on each layer."""
+    cache = {}
     cache["A0"] = X
     for i in range(1, L):
         W = weights["W{}".format(i)]
