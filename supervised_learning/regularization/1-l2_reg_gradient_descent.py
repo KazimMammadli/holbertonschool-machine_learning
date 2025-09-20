@@ -19,10 +19,13 @@ def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
         dW = (dZ @ A_prev.T) / m + (lambtha / m) * W
         db = np.sum(dZ, axis=1, keepdims=True) / m
 
-        # Backpropagate error if not input layer
+        # Compute dZ_prev before updating weights
         if i > 1:
-            # Update weights and biases
-            weights[f"W{i}"] -= alpha * dW
-            weights[f"b{i}"] -= alpha * db
-            A_prev = cache[f"A{i-1}"]
-            dZ = (W.T @ dZ) * (1 - A_prev ** 2)  # derivative of tanh
+            dZ_prev = (W.T @ dZ) * (1 - A_prev ** 2)  # derivative of tanh
+
+        # Update weights and biases
+        weights[f"W{i}"] -= alpha * dW
+        weights[f"b{i}"] -= alpha * db
+
+        if i > 1:
+            dZ = dZ_prev
