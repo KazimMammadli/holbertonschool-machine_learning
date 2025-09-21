@@ -22,7 +22,6 @@ def dropout_gradient_descent(Y, weights, cache, alpha, keep_prob, L):
             W = weights[f"W{i}"]
             dZ = W.T @ dZ
             A_prev_current = cache[f"A{i-1}"]
-            dZ = dZ * (1 - A_prev_current ** 2)  # derivative of tanh
             D = cache[f"D{i-1}"]
             dZ = dZ * D / keep_prob
             dZ = dZ * (1 - A_prev_current ** 2)  # derivative of tanh
