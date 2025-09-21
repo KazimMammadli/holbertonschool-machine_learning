@@ -17,10 +17,6 @@ def dropout_gradient_descent(Y, weights, cache, alpha, keep_prob, L):
         dW = (dZ @ A_prev.T) / m
         db = np.sum(dZ, axis=1, keepdims=True) / m
 
-        # Update weights and biases
-        weights[f"W{i}"] -= alpha * dW
-        weights[f"b{i}"] -= alpha * db
-
         # Backpropagate error if not input layer
         if i > 1:
             W = weights[f"W{i}"]
@@ -29,3 +25,9 @@ def dropout_gradient_descent(Y, weights, cache, alpha, keep_prob, L):
             dZ = dZ * (1 - A_prev_current ** 2)  # derivative of tanh
             D = cache[f"D{i-1}"]
             dZ = dZ * D / keep_prob
+            dZ = dZ * (1 - A_prev_current ** 2)  # derivative of tanh
+
+        # Update weights and biases
+        weights[f"W{i}"] -= alpha * dW
+        weights[f"b{i}"] -= alpha * db
+
