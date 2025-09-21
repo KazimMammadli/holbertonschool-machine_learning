@@ -24,7 +24,6 @@ def dropout_gradient_descent(Y, weights, cache, alpha, keep_prob, L):
 
         # Backpropagate error if not input layer
         if i > 1:
-            A_prev = cache[f"A{i-1}"]
             dZ = (W.T @ dZ) * (1 - A_prev ** 2)  # derivative of tanh
             D = cache[f"D{i-1}"]
             dZ = dZ * D / keep_prob
