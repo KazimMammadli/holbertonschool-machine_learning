@@ -7,7 +7,7 @@ def convolve_grayscale_padding(images, kernel, padding):
     """Return a numpy.ndarray containing the convolved images"""
     m, h, w = images.shape
     kh, kw = kernel.shape
-    ph, pw = paddin
+    ph, pw = padding
     padded_h = h + 2 * ph
     padded_w = w + 2 * pw
     new_w = padded_w - kw + 1
