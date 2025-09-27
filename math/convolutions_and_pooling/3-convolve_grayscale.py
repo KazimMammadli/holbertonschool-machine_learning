@@ -7,9 +7,11 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     """Return a numpy.ndarray containing the convolved images"""
     m, h, w = images.shape
     kh, kw = kernel.shape
+    sh, sw = stride
+
     if padding == 'same':
-        ph = (kh - 1) // 2
-        pw = (kw - 1) // 2
+        ph = int(np.ceil(((h - 1) * sh + kh - h) / 2))
+        pw = int(np.ceil(((w - 1) * sw + kw - w) / 2))
 
     if padding == 'valid':
         ph = 0
@@ -18,7 +20,6 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     if isinstance(padding, tuple):
         ph, pw = padding
 
-    sh, sw = stride
     new_w = (w + 2 * pw - kw) // sw + 1
     new_h = (h + 2 * ph - kh) // sh + 1
     convolved = np.zeros((m, new_h, new_w))
