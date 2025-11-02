@@ -41,7 +41,9 @@ class Yolo:
         # Load class names from file
         with open(classes_path, 'r', encoding='utf-8') as f:
             # strip whitespace/newlines and ignore empty lines
-            self.class_names: List[str] = [line.strip() for line in f if line.strip()]
+            self.class_names: List[str] = [
+                line.strip() for line in f if line.strip()
+            ]
 
         # Store thresholds and anchors
         self.class_t: float = float(class_t)
