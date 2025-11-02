@@ -35,19 +35,16 @@ class Yolo:
 
         Returns:
             (boxes, box_confidences, box_class_probs)
-                boxes: list of ndarrays with shape (grid_h, grid_w, anchor_boxes, 4)
-                box_confidences: list of ndarrays (grid_h, grid_w, anchor_boxes, 1)
-                box_class_probs: list of ndarrays (grid_h, grid_w, anchor_boxes, classes)
         """
         boxes = []
         box_confidences = []
         box_class_probs = []
 
         img_h, img_w = image_size
-        input_h, input_w = self.model.input.shape[1].value, self.model.input.shape[2].value
-        # For TensorFlow 2.x eager mode:
-        if input_h is None or input_w is None:
-            input_h, input_w = self.model.input.shape[1:3]
+
+        # Get input dimensions (works in both TF1.x and TF2.x)
+        input_shape = self.model.input.shape
+        input_h, input_w = int(input_shape[1]), int(input_shape[2])
 
         for i, output in enumerate(outputs):
             grid_h, grid_w, anchor_boxes, _ = output.shape
@@ -58,28 +55,27 @@ class Yolo:
             t_w = output[..., 2]
             t_h = output[..., 3]
 
-            # Box confidence and class probabilities
-            box_conf = 1 / (1 + np.exp(-output[..., 4:5]))  # sigmoid
-            class_probs = 1 / (1 + np.exp(-output[..., 5:]))  # sigmoid
+            # Apply sigmoid to box confidence and class probabilities
+            box_conf = 1 / (1 + np.exp(-output[..., 4:5]))
+            class_probs = 1 / (1 + np.exp(-output[..., 5:]))
 
-            # Grid offsets
+            # Create grid offset arrays
             c_x = np.arange(grid_w).reshape(1, grid_w, 1)
             c_y = np.arange(grid_h).reshape(grid_h, 1, 1)
             c_x = np.tile(c_x, (grid_h, 1, anchor_boxes))
             c_y = np.tile(c_y, (1, grid_w, anchor_boxes))
 
-            # Apply sigmoid to center coordinates
+            # Center coordinates with sigmoid
             bx = (1 / (1 + np.exp(-t_x)) + c_x) / grid_w
             by = (1 / (1 + np.exp(-t_y)) + c_y) / grid_h
 
-            # Scale anchors
+            # Scale width and height using anchors
             pw = self.anchors[i, :, 0]
             ph = self.anchors[i, :, 1]
-
             bw = (np.exp(t_w) * pw) / input_w
             bh = (np.exp(t_h) * ph) / input_h
 
-            # Convert to corner coordinates
+            # Convert to corner coordinates relative to original image size
             x1 = (bx - bw / 2) * img_w
             y1 = (by - bh / 2) * img_h
             x2 = (bx + bw / 2) * img_w
