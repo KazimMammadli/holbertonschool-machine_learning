@@ -1,107 +1,129 @@
 #!/usr/bin/env python3
-"""
-5-yolo.py
-Contains the Yolo class with image preprocessing.
-"""
-
-import os
-import cv2
+"""YOLO v3 object detection module"""
+import tensorflow.keras as K
 import numpy as np
-from tensorflow.keras.models import load_model
+import cv2
+import glob
 
 
 class Yolo:
-    """Yolo v3 object detector."""
+    """YOLO v3 class for object detection"""
 
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
-        """Initialize Yolo."""
-        self.model = load_model(model_path)
-        with open(classes_path, 'r', encoding='utf-8') as f:
-            self.class_names = [c.strip() for c in f if c.strip()]
-        self.class_t = float(class_t)
-        self.nms_t = float(nms_t)
+        """Initialize YOLO instance"""
+        self.model = K.models.load_model(model_path)
+        with open(classes_path, 'r') as f:
+            self.class_names = [line.strip() for line in f]
+        self.class_t = class_t
+        self.nms_t = nms_t
         self.anchors = anchors
 
     def process_outputs(self, outputs, image_size):
-        """Dummy placeholder (from 2-yolo.py)."""
-        pass
+        """Process Darknet outputs"""
+        boxes = []
+        box_confidences = []
+        box_class_probs = []
+
+        image_height, image_width = image_size
+
+        for i, output in enumerate(outputs):
+            grid_height, grid_width, anchor_boxes, _ = output.shape
+
+            box_conf = 1 / (1 + np.exp(-(output[:, :, :, 4:5])))
+            box_class_prob = 1 / (1 + np.exp(-(output[:, :, :, 5:])))
+
+            box_confidences.append(box_conf)
+            box_class_probs.append(box_class_prob)
+
+            t_x = output[:, :, :, 0]
+            t_y = output[:, :, :, 1]
+            t_w = output[:, :, :, 2]
+            t_h = output[:, :, :, 3]
+
+            c_x = np.arange(grid_width).reshape(1, grid_width, 1)
+            c_x = np.tile(c_x, [grid_height, 1, anchor_boxes])
+
+            c_y = np.arange(grid_height).reshape(grid_height, 1, 1)
+            c_y = np.tile(c_y, [1, grid_width, anchor_boxes])
+
+            b_x = (1 / (1 + np.exp(-t_x)) + c_x) / grid_width
+            b_y = (1 / (1 + np.exp(-t_y)) + c_y) / grid_height
+
+            anchor_width = self.anchors[i, :, 0]
+            anchor_height = self.anchors[i, :, 1]
+
+            input_width = self.model.input.shape[1]
+            input_height = self.model.input.shape[2]
+
+            b_w = (np.exp(t_w) * anchor_width) / input_width
+            b_h = (np.exp(t_h) * anchor_height) / input_height
+
+            x1 = (b_x - b_w / 2) * image_width
+            y1 = (b_y - b_h / 2) * image_height
+            x2 = (b_x + b_w / 2) * image_width
+            y2 = (b_y + b_h / 2) * image_height
+
+            box = np.zeros((grid_height, grid_width, anchor_boxes, 4))
+            box[:, :, :, 0] = x1
+            box[:, :, :, 1] = y1
+            box[:, :, :, 2] = x2
+            box[:, :, :, 3] = y2
+
+            boxes.append(box)
+
+        return (boxes, box_confidences, box_class_probs)
 
     def filter_boxes(self, boxes, box_confidences, box_class_probs):
-        """Dummy placeholder (from 2-yolo.py)."""
-        pass
+        """Filter boxes based on class and box scores"""
+        filtered_boxes = []
+        box_classes = []
+        box_scores = []
 
-    def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
-        """Suppress overlapping boxes using NMS."""
-        box_predictions = []
-        predicted_classes = []
-        predicted_scores = []
+        for i in range(len(boxes)):
+            box_score = box_confidences[i] * box_class_probs[i]
+            box_class = np.argmax(box_score, axis=-1)
+            box_score_max = np.max(box_score, axis=-1)
 
-        for c in np.unique(box_classes):
-            idxs = np.where(box_classes == c)
-            boxes = filtered_boxes[idxs]
-            scores = box_scores[idxs]
-            x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
-            areas = (x2 - x1 + 1) * (y2 - y1 + 1)
-            order = scores.argsort()[::-1]
+            mask = box_score_max >= self.class_t
 
-            while order.size > 0:
-                i = order[0]
-                box_predictions.append(boxes[i])
-                predicted_classes.append(c)
-                predicted_scores.append(scores[i])
+            filtered_boxes.append(boxes[i][mask])
+            box_classes.append(box_class[mask])
+            box_scores.append(box_score_max[mask])
 
-                xx1 = np.maximum(x1[i], x1[order[1:]])
-                yy1 = np.maximum(y1[i], y1[order[1:]])
-                xx2 = np.minimum(x2[i], x2[order[1:]])
-                yy2 = np.minimum(y2[i], y2[order[1:]])
+        filtered_boxes = np.concatenate(filtered_boxes)
+        box_classes = np.concatenate(box_classes)
+        box_scores = np.concatenate(box_scores)
 
-                w = np.maximum(0, xx2 - xx1 + 1)
-                h = np.maximum(0, yy2 - yy1 + 1)
-                inter = w * h
-                iou = inter / (areas[i] + areas[order[1:]] - inter)
-                inds = np.where(iou <= self.nms_t)[0]
-                order = order[inds + 1]
+        return (filtered_boxes, box_classes, box_scores)
 
-        box_predictions = np.array(box_predictions)
-        predicted_classes = np.array(predicted_classes)
-        predicted_scores = np.array(predicted_scores)
-        return box_predictions, predicted_classes, predicted_scores
+    def load_images(self, folder_path):
+        """Load images from a folder"""
+        image_paths = glob.glob(folder_path + '/*')
+        images = [cv2.imread(path) for path in image_paths]
 
-    @staticmethod
-    def load_images(folder_path):
-        """Load all images in a folder."""
-        images = []
-        image_paths = []
-        for file in os.listdir(folder_path):
-            path = os.path.join(folder_path, file)
-            if os.path.isfile(path):
-                img = cv2.imread(path)
-                if img is not None:
-                    images.append(img)
-                    image_paths.append(path)
-        return images, image_paths
+        return (images, image_paths)
 
-    
     def preprocess_images(self, images):
-        """Resize, normalize, and convert images for YOLO."""
-        input_h = self.model.input.shape[1]
-        input_w = self.model.input.shape[2]
+        """Preprocess images for YOLO model"""
+        input_h = self.model.input.shape[2]
+        input_w = self.model.input.shape[1]
+
         pimages = []
         image_shapes = []
-        
-        for img in images:
-            h, w = img.shape[:2]
-            image_shapes.append([h, w])
-            
-            # Resize first using INTER_CUBIC (default interpolation)
-            resized = cv2.resize(img, (input_w, input_h),
-                                 interpolation=cv2.INTER_CUBIC)
-            
-            # Convert BGR to RGB after resizing
-            resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
-            
-            # Normalize pixel values
-            normalized = resized / 255.0
-            pimages.append(normalized)
-        
-        return np.array(pimages), np.array(image_shapes)
+
+        for image in images:
+            image_shapes.append(image.shape[:2])
+
+            resized = cv2.resize(
+                image,
+                (input_w, input_h),
+                interpolation=cv2.INTER_CUBIC
+            )
+
+            rescaled = resized / 255.0
+            pimages.append(rescaled)
+
+        pimages = np.array(pimages)
+        image_shapes = np.array(image_shapes)
+
+        return (pimages, image_shapes)
