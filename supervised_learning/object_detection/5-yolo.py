@@ -59,7 +59,6 @@ class Yolo:
                 h = np.maximum(0, yy2 - yy1 + 1)
                 inter = w * h
                 iou = inter / (areas[i] + areas[order[1:]] - inter)
-
                 inds = np.where(iou <= self.nms_t)[0]
                 order = order[inds + 1]
 
@@ -83,26 +82,26 @@ class Yolo:
         return images, image_paths
 
     def preprocess_images(self, images):
-    """Resize, normalize, and convert images for YOLO."""
-    input_h = self.model.input.shape[1]
-    input_w = self.model.input.shape[2]
+        """Resize, normalize, and convert images for YOLO."""
+        input_h = self.model.input.shape[1]
+        input_w = self.model.input.shape[2]
 
-    pimages = []
-    image_shapes = []
+        pimages = []
+        image_shapes = []
 
-    for img in images:
-        h, w = img.shape[:2]
-        image_shapes.append([h, w])
+        for img in images:
+            h, w = img.shape[:2]
+            image_shapes.append([h, w])
 
-        # Convert BGR → RGB
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # Convert BGR → RGB
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        # Resize using INTER_AREA (expected by autograder)
-        resized = cv2.resize(img_rgb, (input_w, input_h),
-                             interpolation=cv2.INTER_AREA)
+            # Resize using INTER_AREA
+            resized = cv2.resize(img_rgb, (input_w, input_h),
+                                 interpolation=cv2.INTER_AREA)
 
-        # Normalize pixel values
-        normalized = resized / 255.0
-        pimages.append(normalized)
+            # Normalize pixel values
+            normalized = resized / 255.0
+            pimages.append(normalized)
 
-    return np.array(pimages), np.array(image_shapes)
+        return np.array(pimages), np.array(image_shapes)
