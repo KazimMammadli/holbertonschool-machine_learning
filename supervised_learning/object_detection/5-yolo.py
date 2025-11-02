@@ -92,6 +92,7 @@ class Yolo:
         for img in images:
             h, w = img.shape[:2]
             image_shapes.append([h, w])
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
             # Resize using INTER_AREA
             resized = cv2.resize(img, (input_w, input_h),
