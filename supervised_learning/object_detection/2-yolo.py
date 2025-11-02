@@ -24,12 +24,15 @@ class Yolo:
             grid_h, grid_w, anchor_boxes, _ = output.shape
             anchors = self.anchors[i]
 
-            tx, ty, tw, th = output[..., 0], output[..., 1], output[..., 2], output[..., 3]
+            tx, ty, tw, th = (output[..., 0], output[..., 1],
+                              output[..., 2], output[..., 3])
             object_conf = output[..., 4:5]
             class_probs = output[..., 5:]
 
-            cx = np.tile(np.arange(grid_w).reshape(1, grid_w, 1), (grid_h, 1, anchor_boxes))
-            cy = np.tile(np.arange(grid_h).reshape(grid_h, 1, 1), (1, grid_w, anchor_boxes))
+            cx = np.tile(np.arange(grid_w).reshape(1, grid_w, 1),
+                         (grid_h, 1, anchor_boxes))
+            cy = np.tile(np.arange(grid_h).reshape(grid_h, 1, 1),
+                         (1, grid_w, anchor_boxes))
 
             bx = (1 / (1 + np.exp(-tx)) + cx) / grid_w
             by = (1 / (1 + np.exp(-ty)) + cy) / grid_h
