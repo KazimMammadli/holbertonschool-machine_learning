@@ -81,25 +81,27 @@ class Yolo:
                     image_paths.append(path)
         return images, image_paths
 
+    
     def preprocess_images(self, images):
         """Resize, normalize, and convert images for YOLO."""
         input_h = self.model.input.shape[1]
         input_w = self.model.input.shape[2]
-
         pimages = []
         image_shapes = []
-
+        
         for img in images:
             h, w = img.shape[:2]
             image_shapes.append([h, w])
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-            # Resize using INTER_AREA
+            
+            # Resize first using INTER_CUBIC (default interpolation)
             resized = cv2.resize(img, (input_w, input_h),
-                                 interpolation=cv2.INTER_AREA)
-
+                                 interpolation=cv2.INTER_CUBIC)
+            
+            # Convert BGR to RGB after resizing
+            resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+            
             # Normalize pixel values
             normalized = resized / 255.0
             pimages.append(normalized)
-
+        
         return np.array(pimages), np.array(image_shapes)
