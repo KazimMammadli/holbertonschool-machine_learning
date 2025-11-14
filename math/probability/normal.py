@@ -38,6 +38,17 @@ class Normal:
         """Calculates the x-value of a given z-score"""
         return (self.mean + z * self.stddev)
 
+    def pdf(self, x):
+        """Calculates the value of the PDF for a given x-value"""
+        return ((1 / (self.stddev * (2 * pi) ** 0.5)) *
+                e ** (-0.5 * ((x - self.mean) / self.stddev) ** 2))
+
+    @staticmethod
+    def erf(x):
+        """Error function"""
+        return 2 * (x - x ** 3 / 3 + x ** 5 / 10
+                    - x ** 7 / 42 + x ** 9 / 216) / pi ** 0.5
+
     def cdf(self, x):
         """Calculates the value of the CDF for a given x-value"""
         return 0.5 * (1 + self.erf((x - self.mean) / (self.stddev * 2 ** 0.5)))
