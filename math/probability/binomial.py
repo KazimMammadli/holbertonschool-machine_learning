@@ -12,7 +12,7 @@ class Binomial:
         if data is None:
 
             if n <= 0:
-                raise ValueError("stddev must be a positive value")
+                raise ValueError("n must be a positive value")
             if p < 0 or p > 1:
                 raise ValueError("p must be greater than 0 and less than 1")
             self.n = int(n)
