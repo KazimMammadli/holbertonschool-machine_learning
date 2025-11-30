@@ -4,6 +4,11 @@ import numpy as np
 
 
 def cost(P, Q):
-    """Calculates the cost of the t-SNE transformation."""
-    return (np.sum(np.maximum(P, 1e-12) *
-                   np.log(np.maximum(P, 1e-12) / (np.maximum(Q, 1e-12)))))
+    """
+    Compute the cost
+    :param P: All P affinities
+    :param Q: All Q affinities
+    :return: The cost for a given step
+    """
+    return (np.sum(np.maximum(P, 1e-12) * np.log(np.maximum(P, 1e-12)
+                                                 / (np.maximum(Q, 1e-12)))))
