@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cost"""
+"""Dimensionality Reduction - Cost."""
 import numpy as np
 
 
