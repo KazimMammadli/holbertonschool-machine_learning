@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
-"""Initialize GMM"""
+"""
+Initializes variables for a Gaussian Mixture Model
+"""
 import numpy as np
 kmeans = __import__('1-kmeans').kmeans
 
 
 def initialize(X, k):
     """
-    Initilize variable (pi, means, covariance matrix)
-    for a Gaussian Mixture Model
+    Initializes variables for a Gaussian Mixture Model
     """
-    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+    if type(X) is not np.ndarray or len(X.shape) != 2:
+        return None, None, None
+    if type(k) is not int or k <= 0:
         return None, None, None
 
-    if not isinstance(k, int) or k <= 0:
-        return None, None, None
-
-    _, d = X.shape
-
-    pi = np.ones(shape=(k,)) / k
-    m, _ = kmeans(X, k)
+    n, d = X.shape
+    centroids, clss = kmeans(X, k, iterations=1000)
+    pi = np.ones(k) / k
+    m = centroids
     S = np.tile(np.identity(d), (k, 1)).reshape((k, d, d))
 
     return pi, m, S
