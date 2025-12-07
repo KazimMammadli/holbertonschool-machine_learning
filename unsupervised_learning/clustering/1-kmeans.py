@@ -1,53 +1,37 @@
 #!/usr/bin/env python3
-"""K-means"""
+"""
+Performs K-means
+"""
 import numpy as np
 
 
-def initialize(X, k):
-    """Performs K-means on a dataset"""
-    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
-        return None
-    if not isinstance(k, int) or k <= 0:
-        return None
-
-    X_min = np.min(X, axis=0)
-    X_max = np.max(X, axis=0)
-
-    cluster_center_coords = np.random.uniform(X_min, X_max, (k, X.shape[1]))
-
-    return cluster_center_coords
-
-
-def compute_centroid_distance(X, centroids_coords):
-    """Compute the distance between a point and the K centroids"""
-    return np.sqrt(np.sum((X - centroids_coords[:, np.newaxis]) ** 2, axis=2))
-
-
 def kmeans(X, k, iterations=1000):
-    """Run the full Kmean algorithms"""
-    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+    """
+    Performs K-means on a dataset
+    """
+    if type(k) is not int or k <= 0:
         return None, None
-    if not isinstance(k, int) or k <= 0:
+    if type(X) is not np.ndarray or len(X.shape) != 2:
         return None, None
-    if not isinstance(iterations, np.int) or iterations <= 0:
+    if type(iterations) is not int or iterations <= 0:
         return None, None
-
-    centroids = initialize(X, k)
-
+    n, d = X.shape
+    centroids = np.random.uniform(np.min(X, axis=0), np.max(X, axis=0),
+                                  size=(k, d))
     for i in range(iterations):
-        centroids_copy = centroids.copy()
-        points_centroids_distance = compute_centroid_distance(X, centroids)
-        clss = np.argmin(points_centroids_distance, axis=0)
-
+        copy = centroids.copy()
+        D = np.sqrt(((X - centroids[:, np.newaxis]) ** 2).sum(axis=2))
+        clss = np.argmin(D, axis=0)
         for j in range(k):
             if len(X[clss == j]) == 0:
-                centroids[j] = initialize(X, 1)
+                centroids[j] = np.random.uniform(np.min(X, axis=0),
+                                                 np.max(X, axis=0),
+                                                 size=(1, d))
             else:
-                centroids[j] = np.mean(X[clss == j], axis=0)
-
-        points_centroids_distance = compute_centroid_distance(X, centroids)
-        clss = np.argmin(points_centroids_distance, axis=0)
-        if np.all(centroids_copy == centroids):
-            break
+                centroids[j] = (X[clss == j]).mean(axis=0)
+        D = np.sqrt(((X - centroids[:, np.newaxis]) ** 2).sum(axis=2))
+        clss = np.argmin(D, axis=0)
+        if np.all(copy == centroids):
+            return centroids, clss
 
     return centroids, clss
