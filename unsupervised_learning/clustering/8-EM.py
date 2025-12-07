@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""some comments"""
+"""
+Performs the expectation maximization for a GMM
+"""
 import numpy as np
 initialize = __import__('4-initialize').initialize
 expectation = __import__('6-expectation').expectation
@@ -8,48 +10,38 @@ maximization = __import__('7-maximization').maximization
 
 def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
     """
-    Run the EM algorythm using GMM as `backend-end`
+    Performs the expectation maximization for a GMM
     """
-    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+    if type(X) is not np.ndarray or len(X.shape) != 2:
         return None, None, None, None, None
-    if not isinstance(k, int) or k <= 0:
+    if type(k) is not int or k <= 0:
         return None, None, None, None, None
-    if not isinstance(iterations, int) or iterations <= 0:
+    if type(iterations) is not int or iterations <= 0:
         return None, None, None, None, None
-    if not isinstance(tol, float) or tol <= 0:
+    if type(tol) is not float or tol < 0:
         return None, None, None, None, None
-    if not isinstance(verbose, bool):
+    if type(verbose) is not bool:
         return None, None, None, None, None
 
-    pi, m, S = initialize(X, k)
-    likelihood_history = []
-    g, likelihood = 0, 0
     i = 0
-
-    for i in range(iterations + 1):
-        g, likelihood = expectation(X, pi, m, S)
-        if i == iterations:
-            # Wierd checker outcome
+    l_prev = 0
+    pi, mean, cov = initialize(X, k)
+    g, log_like = expectation(X, pi, mean, cov)
+    while i < iterations:
+        if (np.abs(l_prev - log_like)) <= tol:
             break
+        l_prev = log_like
 
-        if (len(likelihood_history) and
-                np.abs(likelihood_history[-1] - likelihood) <= tol):
-            break
+        if verbose is True and (i % 10 == 0):
+            rounded = log_like.round(5)
+            print("Log Likelihood after {} iterations: {}".format(i, rounded))
 
-        likelihood_history.append(likelihood)
+        pi, mean, cov = maximization(X, g)
+        g, log_like = expectation(X, pi, mean, cov)
+        i += 1
 
-        pi, m, S = maximization(X, g)
+    if verbose is True:
+        rounded = log_like.round(5)
+        print("Log Likelihood after {} iterations: {}".format(i, rounded))
 
-        if verbose and i % 10 == 0:
-            print("Log Likelihood after {} iterations: {}".format(
-                i,
-                np.round(likelihood, 5)
-            ))
-
-    if verbose:
-        print("Log Likelihood after {} iterations: {}".format(
-            i,
-            np.round(likelihood, 5)
-        ))
-
-    return pi, m, S, g, likelihood
+    return pi, mean, cov, g, log_like
