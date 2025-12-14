@@ -66,7 +66,7 @@ class BayesianOptimization:
         idx_optimum = np.argmin(self.gp.Y) if self.minimize\
             else np.argmax(self.gp.Y)
 
-        # For the checker go get the same output, idk 
+        # For the checker go get the same output, idk
         self.gp.X = self.gp.X[:-1, :]
 
         return self.gp.X[idx_optimum], self.gp.Y[idx_optimum]
