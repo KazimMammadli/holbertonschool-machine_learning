@@ -1,0 +1,98 @@
+======================================================================
+BAYESIAN OPTIMIZATION REPORT
+======================================================================
+
+Optimization Start: 2025-12-14 17:40:58
+Optimization End: 2025-12-14 18:05:42
+Total Duration: 0:24:43.346857
+
+DATASET INFORMATION
+----------------------------------------------------------------------
+Dataset: MNIST (Handwritten Digits)
+Training Samples: 51000
+Validation Samples: 9000
+Test Samples: 10000
+
+MODEL ARCHITECTURE
+----------------------------------------------------------------------
+Convolutional Neural Network (CNN)
+- Conv2D Layer 1 (filters=conv_filters, kernel=3x3, activation=ReLU)
+- MaxPooling2D (pool_size=2x2)
+- Conv2D Layer 2 (filters=conv_filters*2, kernel=3x3, activation=ReLU)
+- MaxPooling2D (pool_size=2x2)
+- Flatten
+- Dense Layer (units=dense_units, activation=ReLU)
+- Dropout (rate=dropout_rate)
+- Output Dense Layer (10 units, activation=softmax)
+
+HYPERPARAMETER SEARCH SPACE
+----------------------------------------------------------------------
+learning_rate       : (1e-05, 0.01)
+conv_filters        : (16, 32, 64)
+dense_units         : (64, 128, 256, 512)
+dropout_rate        : (0.1, 0.5)
+l2_reg              : (1e-06, 0.001)
+batch_size          : (32, 64, 128)
+
+OPTIMIZATION CONFIGURATION
+----------------------------------------------------------------------
+Optimization Method: Bayesian Optimization with Gaussian Processes
+Acquisition Function: Expected Improvement (EI)
+Maximum Iterations: 30
+Initial Random Samples: 5
+Early Stopping Patience: 5 epochs
+Maximum Training Epochs: 30
+
+BEST HYPERPARAMETERS
+----------------------------------------------------------------------
+Learning Rate:       0.003203
+Conv Filters:        64
+Dense Units:         64
+Dropout Rate:        0.3457
+L2 Regularization:   0.000001
+Batch Size:          128
+Best Val Accuracy:   0.9929
+
+OPTIMIZATION HISTORY (All Iterations)
+----------------------------------------------------------------------
+Iter   Val Acc   Best So Far
+----------------------------------------------------------------------
+   1    0.9899        0.9899
+   2    0.9873        0.9899
+   3    0.9717        0.9899
+   4    0.9867        0.9899
+   5    0.9821        0.9899
+   6    0.9881        0.9899
+   7    0.9859        0.9899
+   8    0.9841        0.9899
+   9    0.9772        0.9899
+  10    0.9810        0.9899
+  11    0.9780        0.9899
+  12    0.9874        0.9899
+  13    0.9748        0.9899
+  14    0.9838        0.9899
+  15    0.9736        0.9899
+  16    0.9860        0.9899
+  17    0.9910        0.9910
+  18    0.9864        0.9910
+  19    0.9737        0.9910
+  20    0.9894        0.9910
+  21    0.9887        0.9910
+  22    0.9877        0.9910
+  23    0.9879        0.9910
+  24    0.9890        0.9910
+  25    0.9887        0.9910
+  26    0.9918        0.9918
+  27    0.9928        0.9928
+  28    0.9926        0.9928
+  29    0.9926        0.9928
+  30    0.9863        0.9928
+  31    0.9904        0.9928
+  32    0.9881        0.9928
+  33    0.9929        0.9929
+  34    0.9920        0.9929
+  35    0.9864        0.9929
+
+======================================================================
+END OF REPORT
+======================================================================
