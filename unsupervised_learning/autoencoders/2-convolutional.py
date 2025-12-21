@@ -6,11 +6,12 @@ import tensorflow.keras as keras
 def autoencoder(input_dims, filters, latent_dims):
     """
     Creates an autoencoder model.
+
     Args:
         input_dims (tuple): Tuple of integers containing the dimensions of
         the model input
-        filters (list) : Containing the number of filters for each convolutional
-        layer in the encoder
+        filters (list) : Containing the number of filters for each
+        convolutional layer in the encoder
         latent_dims (tuple): Tuple of integers containing the dimensions of the
         latent space representation
     Returns:
@@ -38,7 +39,6 @@ def autoencoder(input_dims, filters, latent_dims):
                                 activation='relu')(x)
         x = keras.layers.UpSampling2D(size=(2, 2))(x)
 
-    
     decoder_output = keras.layers.Conv2D(input_dims[-1], kernel_size=(3, 3),
                                          padding='same',
                                          activation='sigmoid')(x)
