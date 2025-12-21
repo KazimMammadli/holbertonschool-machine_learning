@@ -17,7 +17,6 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
         decoder (Model): Decoder model
         auto (Model): Full autoencoder model
     """
-
     encoder_input = keras.Input(shape=(input_dims,))
     x = encoder_input
 
@@ -27,7 +26,6 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
     latent = keras.layers.Dense(latent_dims, activation='relu')(x)
 
     encoder = keras.Model(encoder_input, latent)
-
 
     decoder_input = keras.Input(shape=(latent_dims,))
     x = decoder_input
@@ -39,7 +37,6 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
 
     decoder = keras.Model(decoder_input, decoder_output)
 
-  
     auto_output = decoder(encoder(encoder_input))
     auto = keras.Model(encoder_input, auto_output)
 
