@@ -6,6 +6,15 @@ import matplotlib.pyplot as plt
 
 
 class Simple_GAN(keras.Model):
+    """
+    Simple GAN implementation using a custom Keras Model.
+
+    This GAN follows an LSGAN-style objective where:
+    - Real samples are labeled as +1
+    - Fake samples are labeled as -1
+    - The generator tries to fool the discriminator into
+      predicting +1 for fake samples.
+    """
 
     def __init__(
         self,
@@ -17,6 +26,18 @@ class Simple_GAN(keras.Model):
         disc_iter=2,
         learning_rate=0.005,
     ):
+        """
+        Initialize the GAN components and optimizers.
+
+        Args:
+            generator: Keras model generating fake samples.
+            discriminator: Keras model scoring real/fake samples.
+            latent_generator: Function generating latent vectors.
+            real_examples: Tensor of real training samples.
+            batch_size: Number of samples per training batch.
+            disc_iter: Number of discriminator updates per step.
+            learning_rate: Adam optimizer learning rate.
+        """
         super().__init__()
 
         self.latent_generator = latent_generator
@@ -71,8 +92,17 @@ class Simple_GAN(keras.Model):
             loss=self.discriminator.loss,
         )
 
-    # Generator of fake samples
     def get_fake_sample(self, size=None, training=False):
+        """
+        Generate a batch of fake samples using the generator.
+
+        Args:
+            size: Number of samples to generate.
+            training: Whether the generator is in training mode.
+
+        Returns:
+            Tensor of generated fake samples.
+        """
         if not size:
             size = self.batch_size
 
@@ -81,8 +111,16 @@ class Simple_GAN(keras.Model):
             training=training,
         )
 
-    # Generator of real samples
     def get_real_sample(self, size=None):
+        """
+        Randomly sample real examples from the dataset.
+
+        Args:
+            size: Number of real samples to retrieve.
+
+        Returns:
+            Tensor of real samples.
+        """
         if not size:
             size = self.batch_size
 
@@ -99,8 +137,20 @@ class Simple_GAN(keras.Model):
             random_indices,
         )
 
-    # Overloading train_step()
     def train_step(self, useless_argument):
+        """
+        Perform one GAN training step.
+
+        The discriminator is trained multiple times, followed
+        by a single generator update.
+
+        Args:
+            useless_argument: Required by Keras but unused.
+
+        Returns:
+            Dictionary containing discriminator and generator
+            losses for monitoring.
+        """
 
         # 1) Train discriminator
         for _ in range(self.disc_iter):
