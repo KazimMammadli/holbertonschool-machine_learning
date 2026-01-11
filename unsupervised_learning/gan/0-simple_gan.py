@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""This module is about Simple GAN."""
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
