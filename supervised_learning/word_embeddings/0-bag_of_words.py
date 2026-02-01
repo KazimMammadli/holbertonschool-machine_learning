@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-'''creates a bag of words embedding matrix
-'''
+"""Bag Of Words for matrix"""
+from sklearn.feature_extraction.text import CountVectorizer
 
 
 def bag_of_words(sentences, vocab=None):
