@@ -28,7 +28,7 @@ class Transformer(tf.keras.Model):
             drop_rate: the dropout rate
         """
         super(Transformer, self).__init__()
-        
+
         self.encoder = Encoder(N, dm, h, hidden, input_vocab,
                                max_seq_input, drop_rate)
         self.decoder = Decoder(N, dm, h, hidden, target_vocab,
@@ -54,12 +54,11 @@ class Transformer(tf.keras.Model):
         """
         # Encode the input
         enc_output = self.encoder(inputs, training, encoder_mask)
-        
+ 
         # Decode with encoder output
         dec_output = self.decoder(target, enc_output, training,
                                   look_ahead_mask, decoder_mask)
-        
+
         # Final linear layer
         final_output = self.linear(dec_output)
-        
         return final_output
