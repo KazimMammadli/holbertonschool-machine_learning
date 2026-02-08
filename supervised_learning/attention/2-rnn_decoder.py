@@ -1,81 +1,74 @@
 #!/usr/bin/env python3
-"""
-RNN Decoder module for machine translation with attention
-"""
-
+"""RNN Decoder Module"""
 import tensorflow as tf
-
 SelfAttention = __import__('1-self_attention').SelfAttention
 
 
 class RNNDecoder(tf.keras.layers.Layer):
     """
-    RNN Decoder class using GRU and self-attention
+    RNN Decoder class for machine translation that uses attention
     """
 
     def __init__(self, vocab, embedding, units, batch):
         """
-        Class constructor
+        Initialize the RNN Decoder
 
         Args:
-            vocab (int): size of the output vocabulary
-            embedding (int): dimensionality of the embedding vectors
-            units (int): number of hidden units in the GRU
-            batch (int): batch size
+            vocab: integer representing the size of the output vocabulary
+            embedding: integer representing the dimensionality of the
+                      embedding vector
+            units: integer representing the number of hidden units in
+                  the RNN cell
+            batch: integer representing the batch size
         """
         super(RNNDecoder, self).__init__()
-
-        self.embedding = tf.keras.layers.Embedding(
-            input_dim=vocab,
-            output_dim=embedding
-        )
-
+        self.embedding = tf.keras.layers.Embedding(vocab, embedding)
         self.gru = tf.keras.layers.GRU(
-            units=units,
+            units,
             return_sequences=True,
             return_state=True,
             recurrent_initializer='glorot_uniform'
         )
-
-        self.F = tf.keras.layers.Dense(units=vocab)
-
-        self.attention = SelfAttention(units)
+        self.F = tf.keras.layers.Dense(vocab)
 
     def call(self, x, s_prev, hidden_states):
         """
-        Forward pass of the decoder
+        Forward pass through the decoder
 
         Args:
-            x (tf.Tensor): previous target word
-                           shape (batch, 1)
-            s_prev (tf.Tensor): previous decoder hidden state
-                                shape (batch, units)
-            hidden_states (tf.Tensor): encoder outputs
-                                       shape (batch, input_seq_len, units)
+            x: tensor of shape (batch, 1) containing the previous word
+               in the target sequence as an index of the target
+               vocabulary
+            s_prev: tensor of shape (batch, units) containing the
+                   previous decoder hidden state
+            hidden_states: tensor of shape (batch, input_seq_len, units)
+                          containing the outputs of the encoder
 
         Returns:
-            y (tf.Tensor): output word scores
-                           shape (batch, vocab)
-            s (tf.Tensor): new decoder hidden state
-                           shape (batch, units)
+            y: tensor of shape (batch, vocab) containing the output
+               word as a one hot vector in the target vocabulary
+            s: tensor of shape (batch, units) containing the new
+               decoder hidden state
         """
-        # Compute attention context
-        context, _ = self.attention(s_prev, hidden_states)
+        # Initialize self-attention
+        attention = SelfAttention(s_prev.shape[1])
 
-        # Embed input word
+        # Calculate context vector using attention
+        context, _ = attention(s_prev, hidden_states)
+
+        # Embed the input word
         x = self.embedding(x)
 
-        # Concatenate context and embedding
-        context = tf.expand_dims(context, axis=1)
-        x = tf.concat([context, x], axis=-1)
+        # Concatenate context vector with embedded input
+        x = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
 
-        # Pass through GRU (IMPORTANT: initial_state must be a list)
-        outputs, s = self.gru(x, initial_state=[s_prev])
+        # Pass through GRU
+        output, s = self.gru(x, initial_state=s_prev)
 
-        # Reshape output for Dense layer
-        outputs = tf.reshape(outputs, (-1, outputs.shape[2]))
+        # Remove the time dimension
+        output = tf.squeeze(output, axis=1)
 
-        # Final output
-        y = self.F(outputs)
+        # Apply final dense layer
+        y = self.F(output)
 
         return y, s
