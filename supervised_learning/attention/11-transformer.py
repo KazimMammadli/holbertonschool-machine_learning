@@ -54,7 +54,6 @@ class Transformer(tf.keras.Model):
         """
         # Encode the input
         enc_output = self.encoder(inputs, training, encoder_mask)
- 
         # Decode with encoder output
         dec_output = self.decoder(target, enc_output, training,
                                   look_ahead_mask, decoder_mask)
