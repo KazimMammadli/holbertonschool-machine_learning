@@ -69,8 +69,8 @@ class RNNDecoder(tf.keras.layers.Layer):
         context = tf.expand_dims(context, axis=1)
         x = tf.concat([context, x], axis=-1)
 
-        # Pass through GRU
-        outputs, s = self.gru(x, initial_state=s_prev)
+        # Pass through GRU (IMPORTANT: initial_state must be a list)
+        outputs, s = self.gru(x, initial_state=[s_prev])
 
         # Reshape output for Dense layer
         outputs = tf.reshape(outputs, (-1, outputs.shape[2]))
