@@ -60,7 +60,10 @@ class RNNDecoder(tf.keras.layers.Layer):
         x = self.embedding(x)
 
         # Concatenate context vector with embedded input
-        x = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
+        # context shape: (batch, units), x shape: (batch, 1, embedding)
+        # Expand context to (batch, 1, units) then concat
+        context = tf.expand_dims(context, 1)
+        x = tf.concat([context, x], axis=-1)
 
         # Pass through GRU
         output, s = self.gru(x, initial_state=s_prev)
