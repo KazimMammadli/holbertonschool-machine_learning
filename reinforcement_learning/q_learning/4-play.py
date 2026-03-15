@@ -7,8 +7,7 @@ import numpy as np
 
 def play(env, Q, max_steps=100):
     """
-    Has the trained agent play an episode and returns the
-    rendered board at each step.
+    Has the trained agent play an episode
 
     Args:
         env: the FrozenLakeEnv instance
@@ -18,23 +17,24 @@ def play(env, Q, max_steps=100):
     Returns:
         total_reward, rendered_outputs
     """
+    # Reset the environment and capture the initial board state
     state, _ = env.reset()
-    # Capture the initial state of the board
     rendered_outputs = [env.render()]
     total_reward = 0
 
     for _ in range(max_steps):
-        # Always exploit: pick the best action according to Q-table
+        # Exploit the Q-table (Greedy policy)
         action = np.argmax(Q[state])
 
-        # Step the environment
+        # Apply the action
         state, reward, terminated, truncated, _ = env.step(action)
 
-        # Capture the new state of the board
+        # Capture the current board state as a string
         rendered_outputs.append(env.render())
 
         total_reward += reward
 
+        # End episode if agent reached goal, fell in hole, or timed out
         if terminated or truncated:
             break
 
