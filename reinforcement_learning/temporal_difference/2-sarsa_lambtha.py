@@ -1,55 +1,69 @@
 #!/usr/bin/env python3
-"""Module for SARSA(λ) reinforcement learning algorithm."""
+"""
+SARSA(lambda) algorithm implementation.
+"""
+
 import numpy as np
 
 
 def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
-                  alpha=0.1, gamma=0.99, epsilon=1, min_epsilon=0.1,
-                  epsilon_decay=0.05):
-    """Perform SARSA(λ) to update a Q table.
+                  alpha=0.1, gamma=0.99, epsilon=1,
+                  min_epsilon=0.1, epsilon_decay=0.05):
+    """
+    Performs the SARSA(lambda) algorithm.
 
-    Args:
-        env: The environment instance.
-        Q: numpy.ndarray of shape (s, a) containing the Q table.
-        lambtha: The eligibility trace factor.
-        episodes: Total number of episodes to train over.
-        max_steps: Maximum number of steps per episode.
-        alpha: The learning rate.
-        gamma: The discount rate.
-        epsilon: Initial threshold for epsilon greedy.
-        min_epsilon: Minimum value that epsilon should decay to.
-        epsilon_decay: Decay rate for updating epsilon between episodes.
+    Parameters:
+    env (gym.Env): environment instance
+    Q (np.ndarray): Q-table of shape (s, a)
+    lambtha (float): eligibility trace factor
+    episodes (int): number of episodes
+    max_steps (int): max steps per episode
+    alpha (float): learning rate
+    gamma (float): discount factor
+    epsilon (float): initial epsilon
+    min_epsilon (float): minimum epsilon
+    epsilon_decay (float): decay rate
 
     Returns:
-        Q: The updated Q table.
+    np.ndarray: updated Q-table
     """
-    for ep in range(episodes):
-        state, _ = env.reset()
-        E = np.zeros_like(Q)
 
-        if np.random.binomial(1, epsilon):
-            action = env.action_space.sample()
-        else:
-            action = np.argmax(Q[state])
+    def epsilon_greedy(state):
+        """Select action using epsilon-greedy policy."""
+        if np.random.uniform() < epsilon:
+            return np.random.randint(Q.shape[1])
+        return np.argmax(Q[state])
+
+    for _ in range(episodes):
+        state, _ = env.reset()
+        action = epsilon_greedy(state)
+
+        # Eligibility traces
+        E = np.zeros_like(Q)
 
         for _ in range(max_steps):
             next_state, reward, terminated, truncated, _ = env.step(action)
-            done = terminated or truncated
+            next_action = epsilon_greedy(next_state)
 
-            if np.random.binomial(1, epsilon):
-                next_action = env.action_space.sample()
-            else:
-                next_action = np.argmax(Q[next_state])
-
+            # TD error
             delta = reward + gamma * Q[next_state, next_action] - Q[state, action]
+
+            # Increase eligibility
             E[state, action] += 1
+
+            # Update all Q values
             Q += alpha * delta * E
+
+            # Decay eligibility traces
             E *= gamma * lambtha
 
-            if done:
-                break
-            state, action = next_state, next_action
+            state = next_state
+            action = next_action
 
-        epsilon = max(min_epsilon, epsilon - epsilon_decay)
+            if terminated or truncated:
+                break
+
+        # Decay epsilon
+        epsilon = max(min_epsilon, epsilon * (1 - epsilon_decay))
 
     return Q
