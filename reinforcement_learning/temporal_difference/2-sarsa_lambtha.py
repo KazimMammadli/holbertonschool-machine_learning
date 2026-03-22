@@ -23,6 +23,8 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
     Returns:
         Q: The updated Q table.
     """
+    init_epsilon = epsilon
+
     for ep in range(episodes):
         state, _ = env.reset()
         E = np.zeros_like(Q)
@@ -50,6 +52,7 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
                 break
             state, action = next_state, next_action
 
-        epsilon = max(min_epsilon, epsilon - epsilon_decay)
+        epsilon = (min_epsilon + (init_epsilon - min_epsilon)
+                   * np.exp(-epsilon_decay * ep))
 
     return Q
