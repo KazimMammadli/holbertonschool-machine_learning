@@ -1,38 +1,48 @@
 #!/usr/bin/env python3
 """
-Module for Monte Carlo algorithm
+Monte Carlo algorithm for state-value function estimation.
 """
+
 import numpy as np
 
 
-def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
-                alpha=0.1, gamma=0.99):
+def monte_carlo(env, V, policy, episodes=5000,
+                max_steps=100, alpha=0.1, gamma=0.99):
     """
-    Performs the Monte Carlo algorithm
+    Performs the Monte Carlo algorithm to update value estimates.
+
+    Parameters:
+    env (gym.Env): environment instance
+    V (numpy.ndarray): value estimates of shape (s,)
+    policy (function): maps state -> action
+    episodes (int): number of episodes
+    max_steps (int): max steps per episode
+    alpha (float): learning rate
+    gamma (float): discount factor
+
+    Returns:
+    numpy.ndarray: updated value estimates
     """
     for _ in range(episodes):
         state, _ = env.reset()
         episode = []
+
+        # Generate episode
         for _ in range(max_steps):
             action = policy(state)
             next_state, reward, terminated, truncated, _ = env.step(action)
-            episode.append([state, reward])
-            if terminated or truncated:
-                break
+
+            episode.append((state, reward))
+
             state = next_state
 
-        # Convert episode to numpy array for easier indexing if needed,
-        # but iterating backwards is more operation-efficient.
+            if terminated or truncated:
+                break
+
+        # Compute returns and update V
         G = 0
-        # Track states visited in this episode to ensure First-Visit logic
-        episode_states = [step[0] for step in episode]
-        
-        for t in range(len(episode) - 1, -1, -1):
-            state_t, reward_t = episode[t]
-            G = gamma * G + reward_t
-            
-            # First-visit check: t is the first occurrence of state_t
-            if state_t not in episode_states[:t]:
-                V[state_t] = V[state_t] + alpha * (G - V[state_t])
-                
+        for state, reward in reversed(episode):
+            G = gamma * G + reward
+            V[state] += alpha * (G - V[state])
+
     return V
