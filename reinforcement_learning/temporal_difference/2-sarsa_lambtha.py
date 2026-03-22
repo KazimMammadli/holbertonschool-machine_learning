@@ -14,14 +14,13 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
     """
 
     def epsilon_greedy(state, eps):
-        """Epsilon-greedy policy."""
         if np.random.uniform() < eps:
             return np.random.randint(Q.shape[1])
         return np.argmax(Q[state])
 
     for _ in range(episodes):
         state, _ = env.reset()
-        eps = epsilon  # freeze epsilon
+        eps = epsilon
 
         action = epsilon_greedy(state, eps)
 
@@ -29,19 +28,29 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
 
         for _ in range(max_steps):
             next_state, reward, terminated, truncated, _ = env.step(action)
-            next_action = epsilon_greedy(next_state, eps)
 
-            delta = reward + gamma * Q[next_state, next_action] - Q[state, action]
+            if not (terminated or truncated):
+                next_action = epsilon_greedy(next_state, eps)
 
-            E[state, action] += 1
+
+            if terminated or truncated:
+                delta = reward - Q[state, action]
+            else:
+                delta = reward + gamma * Q[next_state, next_action] - Q[state, action]
+
+            E[state, action] = 1
+
+            # Update
             Q += alpha * delta * E
-            E *= gamma * lambtha
 
-            state = next_state
-            action = next_action
+            # Decay traces
+            E *= gamma * lambtha
 
             if terminated or truncated:
                 break
+
+            state = next_state
+            action = next_action
 
         epsilon = max(min_epsilon, epsilon * (1 - epsilon_decay))
 
