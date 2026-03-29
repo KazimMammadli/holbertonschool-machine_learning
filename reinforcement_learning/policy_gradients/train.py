@@ -1,45 +1,51 @@
 #!/usr/bin/env python3
-"""Policy Gradient module"""
+"""Training module for policy gradient reinforcement learning."""
 import numpy as np
-from policy_gradient import policy
-from policy_gradient import policy_gradient
+policy_gradient = __import__('policy_gradient').policy_gradient
 
 
-def single_episode(env, weight, episode, show_result):
-    """play one episode"""
-    state = env.reset()[None, :]
-    return_grad = []
+def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
+    """Implement a full training using Monte-Carlo policy gradient (REINFORCE).
 
-    while True:
-        if show_result and (episode % 1000 == 0):
-            env.render()
-        action, grad = policy_gradient(state, weight)
-        state, reward, done, _ = env.step(action)
-        state = state[None, :]
-        return_grad.append((state, action, reward, grad))
-        if done:
-            break
-    env.close()
-    return return_grad
+    Args:
+        env: initial environment
+        nb_episodes: number of episodes used for training
+        alpha: the learning rate
+        gamma: the discount factor
 
-
-def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
-    """a function that implements a full training"""
-    weight = np.random.rand(4, 2)
-    episodes = []
+    Returns:
+        scores: list of scores (sum of rewards) for each episode
+    """
+    weight = np.random.rand(env.observation_space.shape[0],
+                            env.action_space.n)
+    scores = []
 
     for episode in range(nb_episodes):
-        single = single_episode(env, weight, episode, show_result)
-        T = len(single) - 1
+        state, _ = env.reset()
+        episode_states = []
+        episode_actions = []
+        episode_rewards = []
+        terminated = False
+        truncated = False
 
-        sum_rewards = 0
-        for t in range(0, T):
-            _, _, reward, grad = single[t]
-            sum_rewards += reward
-            G = np.sum([
-                gamma**single[k][2] *
-                single[k][2] for k in range(t + 1, T + 1)])
-            weight += alpha * G * grad
-        episodes.append(sum_rewards)
-        print("{}: {}".format(episode, sum_rewards), end="\r", flush=False)
-    return episodes
+        while not terminated and not truncated:
+            action, grad = policy_gradient(state, weight)
+            next_state, reward, terminated, truncated, _ = env.step(action)
+
+            episode_states.append(state)
+            episode_actions.append(action)
+            episode_rewards.append(reward)
+
+            state = next_state
+
+        score = sum(episode_rewards)
+        scores.append(score)
+        print("Episode: {} Score: {}".format(episode, score))
+
+        for t in range(len(episode_rewards)):
+            G = sum(gamma ** (k - t) * episode_rewards[k]
+                    for k in range(t, len(episode_rewards)))
+            _, gradient = policy_gradient(episode_states[t], weight)
+            weight += alpha * G * gradient
+
+    return scores
