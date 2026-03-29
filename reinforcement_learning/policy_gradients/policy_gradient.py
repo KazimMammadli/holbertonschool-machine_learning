@@ -1,35 +1,43 @@
 #!/usr/bin/env python3
-"""Policy gradients"""
+"""
+Function to compute Monte Carlo policy gradient based on
+state and weight matrices
+"""
+
+
 import numpy as np
 
 
 def policy(matrix, weight):
-    """ function that computes to policy with a weight of a matrix
-
-    Args:
-        matrix (numpy)
-        weight (numpy)
     """
-    comb = matrix @ weight
-    # compute softmax
-    ex = np.exp(comb - np.max(comb))
-    soft = ex / np.sum(ex)
-    return soft
+    Function that computes to policy with a weight of a matrix.
+    """
+    # for each column of weights, sum (matrix[i] * weight[i]) using dot product
+    dot_product = matrix.dot(weight)
+    # find the exponent of the calculated dot product
+    exp = np.exp(dot_product)
+    # policy is exp / sum(exp)
+    policy = exp / np.sum(exp)
+    return policy
 
 
 def policy_gradient(state, weight):
-    """function that computes the Monte-Carlo policy gradient
-
-    Args:
-        matrix (numpy)
-        weight (numpy)
     """
-    state_mat = policy(state, weight)
-    action = np.random.choice(len(state_mat[0]), p=state_mat[0])
-    # compute gradient softmax
-    softmax = state_mat.reshape(-1, 1)
-    grad_soft = np.diagflat(softmax) - softmax @ softmax.T
-    d_state_mat = grad_soft[action, :]
-    d_log = d_state_mat / state_mat[0, action]
-    grad = state.T @ d_log[None, :]
-    return action, grad
+    state: matrix representing the current observation of the environment
+    weight: matrix of random weight
+    Return: the action and the gradient (in this order)
+    """
+    # first calculate policy using the policy function above
+    Policy = policy(state, weight)
+    # get action from policy
+    action = np.random.choice(len(Policy[0]), p=Policy[0])
+    # reshape single feature from policy
+    s = Policy.reshape(-1, 1)
+    # apply softmax function to s and access value at action
+    softmax = (np.diagflat(s) - np.dot(s, s.T))[action, :]
+    # calculate the dlog as softmax / policy at action
+    dlog = softmax / Policy[0, action]
+    # find gradient from input state matrix using dlog
+    gradient = state.T.dot(dlog[None, :])
+    # return action and the policy gradient
+    return action, gradient
