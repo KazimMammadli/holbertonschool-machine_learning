@@ -4,7 +4,7 @@ import numpy as np
 policy_gradient = __import__('policy_gradient').policy_gradient
 
 
-def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
+def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
     """Implement a full training using Monte-Carlo policy gradient (REINFORCE).
 
     Args:
@@ -12,6 +12,7 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
         nb_episodes: number of episodes used for training
         alpha: the learning rate
         gamma: the discount factor
+        show_result: if True, render the environment every 1000 episodes
 
     Returns:
         scores: list of scores (sum of rewards) for each episode
@@ -19,13 +20,18 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
     weight = np.random.rand(env.observation_space.shape[0],
                             env.action_space.n)
     scores = []
+
     for episode in range(nb_episodes):
         state, _ = env.reset()
         episode_gradients = []
         episode_rewards = []
         terminated = False
         truncated = False
+
         while not terminated and not truncated:
+            if show_result and (episode % 1000 == 0):
+                env.render()
+
             action, gradient = policy_gradient(state, weight)
             next_state, reward, terminated, truncated, _ = env.step(action)
 
